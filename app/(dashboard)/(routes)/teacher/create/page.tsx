@@ -2,6 +2,11 @@
 
 import * as z from "zod";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 import {
     Form,
@@ -12,11 +17,8 @@ import {
     FormMessage,
     FormItem
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 
 const formSchema =z.object({
     title: z.string().min(1, {
@@ -25,7 +27,9 @@ const formSchema =z.object({
 })
 
 const CreatePage = () => {
+    
     const router = useRouter();
+    
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -38,9 +42,10 @@ const CreatePage = () => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try{
             const response = await axios.post("/api/courses", values);
+            router.push(`/teacher/courses/${response.data.id}`)
             
         } catch (ex) {
-            console.log("SOmething went wrong")
+            toast.error("An error occurred. Please try again.")
         }
     }
     
@@ -90,7 +95,7 @@ const CreatePage = () => {
                             </Link>
                             <Button
                                 type="submit"
-                                disabled={!isValid || isSubmitting}
+                                disabled={ !isValid || isSubmitting }
                             >
                                 Continue
                             </Button>
