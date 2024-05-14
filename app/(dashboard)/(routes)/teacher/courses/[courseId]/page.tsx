@@ -21,6 +21,14 @@ const CourseIdPage =  async ({ params }: {
     
     if(!course) return redirect("/");
     
+    const newCourse = {
+        TitleForm: course.title,
+        description: course.description,
+        imageUrl: course.imageUrl,
+        price: course.price,
+        categoryId: course.categoryId
+    }
+    
     const requiredFields = [
         course.title,
         course.description,
@@ -54,7 +62,7 @@ const CourseIdPage =  async ({ params }: {
                     </h2>
                 </div>
                 <TitleForm 
-                    initialData={course}
+                    initialData={newCourse}
                     courseId={course.id}
                 />
             </div>
