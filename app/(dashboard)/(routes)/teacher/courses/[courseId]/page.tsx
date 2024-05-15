@@ -4,6 +4,8 @@ import {redirect} from "next/navigation";
 import IconBadge from "@/components/icon-badge";
 import {LayoutDashboard} from "lucide-react";
 import { TitleForm } from "./_components/title-form";
+import {Description} from "@radix-ui/react-dialog";
+import { DescriptionForm } from "./_components/description-form";
 
 const CourseIdPage =  async ({ params }: {
     params: { courseId: string }
@@ -23,7 +25,7 @@ const CourseIdPage =  async ({ params }: {
     
     const newCourse = {
         TitleForm: course.title,
-        description: course.description,
+        DescriptionForm: course.description || undefined,
         imageUrl: course.imageUrl,
         price: course.price,
         categoryId: course.categoryId
@@ -55,16 +57,22 @@ const CourseIdPage =  async ({ params }: {
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
-                <div className="flex items-center gap-x-2">
-                    <IconBadge icon={LayoutDashboard} />
-                    <h2 className="text-xl">
-                        Customize your course
-                    </h2>
+                <div>
+                    <div className="flex items-center gap-x-2">
+                        <IconBadge icon={LayoutDashboard}/>
+                        <h2 className="text-xl">
+                            Customize your course
+                        </h2>
+                    </div>
+                    <TitleForm
+                        initialData={newCourse}
+                        courseId={course.id}
+                    />
+                    <DescriptionForm
+                        initialData={newCourse}
+                        courseId={course.id}
+                    />
                 </div>
-                <TitleForm 
-                    initialData={newCourse}
-                    courseId={course.id}
-                />
             </div>
         </div>
     )

@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 import axios from "axios";
 
 import {
-    Form, 
+    Form,
     FormControl,
     FormField,
     FormItem,
@@ -19,61 +19,63 @@ import {Pencil} from "lucide-react";
 import {useState} from "react";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
+import {cn} from "@/lib/utils";
+import {Textarea} from "@/components/ui/textarea";
 
 
-interface TitleFormProps {
+interface DescriptionFormProps {
     initialData: {
-        TitleForm: string;
+        DescriptionForm?: string;
     };
     courseId: string;
 }
 
 const formSchema = z.object({
-    TitleForm: z.string().min(1, {
-        message: "Title is required"
+    DescriptionForm: z.string().min(1, {
+        message: "Description is required"
     })
 });
 
-export const TitleForm = ({
-    initialData,
-    courseId
-}: TitleFormProps) => {
-    
+export const DescriptionForm = ({
+  initialData,
+  courseId
+}: DescriptionFormProps) => {
+
     const router = useRouter();
-    
+
     const [isEditing, setIsEditing] = useState(false);
-    
+
     const toggleEdit = () => setIsEditing((current) => (
             !current
         )
     )
-    
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData
     });
-    
+
     const { isSubmitting, isValid } = form.formState;
-    
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const newValues = { title: values.TitleForm };
-        
+        const newValues = { description: values.DescriptionForm };
+
         try {
             await axios.patch(`/api/courses/${courseId}`, newValues);
-            toast.success("Title updated");
-            
+            toast.success("Description updated");
+
             toggleEdit();
-            
+
             router.refresh();
         } catch (error) {
             toast.error("An error occurred");
         }
     }
-    
+
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4">
             <div className="font-medium flex items-center justify-between">
-                Course title
+                Course Description
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing && (
                         <>Cancel</>
@@ -87,25 +89,28 @@ export const TitleForm = ({
                 </Button>
             </div>
             {!isEditing && (
-                <p className="h-4- w-4 mr-2">
-                    {initialData.TitleForm}
+                <p className={cn(
+                    "text-sm mt-2",
+                    !initialData.DescriptionForm && "text-slate-500 italic"
+                )}>
+                    {initialData.DescriptionForm || "No description"}
                 </p>
             )}
             {isEditing && (
                 <Form {...form}>
-                    <form 
+                    <form
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4 mt-4"
                     >
                         <FormField
                             control={form.control}
-                            name="TitleForm"
+                            name="DescriptionForm"
                             render={({field}) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input
+                                        <Textarea
                                             disabled={isSubmitting}
-                                            placeholder="e.g. 'Advanced web development'"
+                                            placeholder="e.g. 'This course is about...'"
                                             {...field}
                                         />
                                     </FormControl>

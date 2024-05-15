@@ -21,9 +21,10 @@ export async function PATCH(
             data: {
                 ...values,
             }
-        })
+        });
         
         return NextResponse.json(course);
+        
     } catch (error) {
         console.error("[COURSE_ID]", error);
         return new NextResponse("An error occurred", { status: 500 });
