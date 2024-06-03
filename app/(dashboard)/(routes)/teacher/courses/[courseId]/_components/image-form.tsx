@@ -1,27 +1,13 @@
 "use client"
 
 import * as z from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useForm} from "react-hook-form";
 import axios from "axios";
-
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage
-} from "@/components/ui/form";
-
 import { Button } from "@/components/ui/button";
 import {ImageIcon, Pencil, PlusCircle} from "lucide-react";
 import {useState} from "react";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
-import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
-import {init} from "effect/Array";
 import Image from "next/image";
 import {FileUpload} from "@/components/file-upload";
 
@@ -51,14 +37,6 @@ export const ImageForm = ({
         )
     )
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            imageUrl: initialData?.imageUrl || ""
-        }
-    });
-
-    const { isSubmitting, isValid } = form.formState;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         //const newValues = { image: values.ImageForm };
@@ -67,8 +45,8 @@ export const ImageForm = ({
             toast.success("Image updated");
 
             toggleEdit();
-
             router.refresh();
+            
         } catch (error) {
             toast.error("An error occurred");
         }
