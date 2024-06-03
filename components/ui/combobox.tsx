@@ -19,10 +19,11 @@ import {
 } from "@/components/ui/popover"
 
 interface ComboboxProps {
-    options: {label: string, value: string}[];
+    options: { label: string, value: string }[];
     value?: string;
     onChange: (value: string) => void;
 }
+
 
 export const Combobox = ({
     options,
@@ -30,7 +31,9 @@ export const Combobox = ({
     onChange,
 }: ComboboxProps) => {
     const [open, setOpen] = React.useState(false)
-
+    
+    const opt2 = [...options]
+    
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -41,7 +44,7 @@ export const Combobox = ({
                     className="w-[200px] justify-between"
                 >
                     {value
-                        ? options.find((option) => option.value === value)?.label
+                        ? opt2.find((option) => option.value === value)?.label
                         : "Select option..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -51,11 +54,11 @@ export const Combobox = ({
                     <CommandInput placeholder="Search option..." />
                     <CommandEmpty>No option found.</CommandEmpty>
                     <CommandGroup>
-                        {options.map((option) => (
+                        {opt2.map((option) => (
                             <CommandItem
                                 key={option.value}
                                 value={option.value}
-                                onSelect={(currentValue) => {
+                                onSelect={() => {
                                     onChange(option.value === value ? "" : option.value)
                                     setOpen(false)
                                 }}

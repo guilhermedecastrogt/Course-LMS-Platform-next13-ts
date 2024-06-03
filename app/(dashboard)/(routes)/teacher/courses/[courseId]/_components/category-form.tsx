@@ -22,6 +22,8 @@ import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
+import { Combobox } from "@/components/ui/combobox";
+import {ALLOWED_PAGE_PROPS} from "next/dist/server/typescript/constant";
 
 
 interface CategoryFormProps {
@@ -31,7 +33,7 @@ interface CategoryFormProps {
 }
 
 const formSchema = z.object({
-    categoryId: z.string().min(1,)
+    categoryId: z.string().min(1)
 });
 
 export const CategoryForm = ({
@@ -59,7 +61,7 @@ export const CategoryForm = ({
     const { isSubmitting, isValid } = form.formState;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const newValues = { category: values.CategoryForm };
+        const newValues = { category: values.categoryId };
 
         try {
             await axios.patch(`/api/courses/${courseId}`, newValues);
@@ -72,7 +74,12 @@ export const CategoryForm = ({
             toast.error("An error occurred");
         }
     }
-
+    
+    const selectedOption = options
+        .find((option) => 
+            option.value === initialData.categoryId);
+    
+    
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4">
             <div className="font-medium flex items-center justify-between">
@@ -92,9 +99,9 @@ export const CategoryForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.category && "text-slate-500 italic"
+                    !initialData.categoryId && "text-slate-500 italic"
                 )}>
-                    {initialData.category || "No category"}
+                    {selectedOption?.label || "No category"}
                 </p>
             )}
             {isEditing && (
@@ -105,13 +112,12 @@ export const CategoryForm = ({
                     >
                         <FormField
                             control={form.control}
-                            name="CategoryForm"
+                            name="categoryId"
                             render={({field}) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            placeholder="e.g. 'This course is about...'"
+                                        <Combobox
+                                            options={options}
                                             {...field}
                                         />
                                     </FormControl>
