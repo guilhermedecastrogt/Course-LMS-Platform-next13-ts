@@ -22,8 +22,8 @@ import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
-import { Combobox } from "@/components/ui/combobox";
 import {ALLOWED_PAGE_PROPS} from "next/dist/server/typescript/constant";
+import { Combobox } from "@/components/ui/combobox";
 
 
 interface CategoryFormProps {
