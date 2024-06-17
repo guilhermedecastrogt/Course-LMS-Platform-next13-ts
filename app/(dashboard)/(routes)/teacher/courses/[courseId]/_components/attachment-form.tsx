@@ -22,9 +22,9 @@ const formSchema = z.object({
 });
 
 export const AttachmentForm = ({
-                              initialData,
-                              courseId
-                          }: AttachmentFormProps) => {
+  initialData,
+  courseId
+}: AttachmentFormProps) => {
 
     const router = useRouter();
 
