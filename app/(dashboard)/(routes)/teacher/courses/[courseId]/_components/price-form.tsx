@@ -20,27 +20,23 @@ import {useState} from "react";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
-import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
-import {ALLOWED_PAGE_PROPS} from "next/dist/server/typescript/constant";
-import { Combobox } from "@/components/ui/combobox";
+import {formatPrice} from "@/lib/format";
 
 
-interface CategoryFormProps {
+interface PriceFormProps {
     initialData: Course;
     courseId: string;
-    options: { label: string; value: string; }[];
 }
 
 const formSchema = z.object({
-    categoryId: z.string().min(1)
+    price: z.coerce.number(),
 });
 
-export const CategoryForm = ({
+export const PriceForm = ({
     initialData,
-    courseId,
-    options
-}: CategoryFormProps) => {
+    courseId
+}: PriceFormProps) => {
 
     const router = useRouter();
 
@@ -54,7 +50,7 @@ export const CategoryForm = ({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            categoryId: initialData?.categoryId || ""
+            price: initialData?.price || undefined,
         },
     });
 
@@ -63,7 +59,7 @@ export const CategoryForm = ({
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             await axios.patch(`/api/courses/${courseId}`, values);
-            toast.success("Category updated");
+            toast.success("Description updated");
 
             toggleEdit();
 
@@ -72,16 +68,11 @@ export const CategoryForm = ({
             toast.error("An error occurred");
         }
     }
-    
-    const selectedOption = options
-        .find((option) => 
-            option.value === initialData.categoryId);
-    
-    
+
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4">
             <div className="font-medium flex items-center justify-between">
-                Course Category
+                Course Price
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing && (
                         <>Cancel</>
@@ -97,9 +88,12 @@ export const CategoryForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.categoryId && "text-slate-500 italic"
+                    !initialData.price && "text-slate-500 italic"
                 )}>
-                    {selectedOption?.label || "No category"}
+                    {initialData.price
+                        ? formatPrice(initialData.price)
+                        : "No price"
+                    }
                 </p>
             )}
             {isEditing && (
@@ -110,12 +104,15 @@ export const CategoryForm = ({
                     >
                         <FormField
                             control={form.control}
-                            name="categoryId"
+                            name="price"
                             render={({field}) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Combobox
-                                            options={options}
+                                        <Input
+                                            type="number"
+                                            step="0.01"
+                                            disabled={isSubmitting}
+                                            placeholder="e.g. 'Set a price for your course"
                                             {...field}
                                         />
                                     </FormControl>
