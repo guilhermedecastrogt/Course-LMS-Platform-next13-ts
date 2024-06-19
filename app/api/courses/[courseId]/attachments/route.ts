@@ -8,7 +8,7 @@ export async function POST(
 ) {
     try {
         const {userId} = auth();
-        const {Url} = await req.json();
+        const {url} = await req.json();
         
         if (!userId) return new NextResponse("Unauthorized", {status:401})
         
@@ -25,8 +25,8 @@ export async function POST(
         
         const attachment = await db.attachment.create({
             data: {
-                Url,
-                Name: Url.split("/").pop(),
+                Url: url,
+                Name: url.split("/").pop(),
                 courseId: params.courseId,
             }
         });

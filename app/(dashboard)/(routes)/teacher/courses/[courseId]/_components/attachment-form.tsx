@@ -3,7 +3,7 @@
 import * as z from "zod";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {ImageIcon, Pencil, PlusCircle} from "lucide-react";
+import {File, ImageIcon, Loader2, Pencil, PlusCircle, X} from "lucide-react";
 import {useState} from "react";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
@@ -29,24 +29,38 @@ export const AttachmentForm = ({
     const router = useRouter();
 
     const [isEditing, setIsEditing] = useState(false);
-
+    const [deletingId, setDeletetingId] = useState<string | null>(null);
+    
     const toggleEdit = () => setIsEditing((current) => (
             !current
         )
     )
 
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         //const newValues = { image: values.ImageForm };
         try {
-            await axios.patch(`/api/courses/${courseId}/attachments`, values);
-            toast.success("Image updated");
+            await axios.post(`/api/courses/${courseId}/attachments`, values);
+            toast.success("Course updated");
 
             toggleEdit();
             router.refresh();
-
+            
         } catch (error) {
+            toast.error("An error occurred"+error);
+        }
+    }
+    
+    const onDelete = async (id: string) => {
+        try {
+            setDeletetingId(id);
+            await axios.delete(`/api/courses/${courseId}/attachments/${id}`);
+            toast.success("Attachment deleted");
+            router.refresh();
+        } catch {
             toast.error("An error occurred");
+            
+        } finally {
+            setDeletetingId(null);
         }
     }
 
@@ -74,6 +88,35 @@ export const AttachmentForm = ({
                         <p className="text-sm mt-2 text-slate-500 italic">
                             No attachments yet
                         </p>
+                    )}
+                    { initialData.attachments.length > 0 && (
+                        <div className="pace-y-2">
+                            {initialData.attachments.map((attachment) => (
+                                <div 
+                                    key={attachment.id}
+                                    className="flex items-center p-3 w-full bg-sky-100 
+                                    border-sky-200 border text-sky-700 rounded-md"
+                                >
+                                    <File className="h-4 w-4 mr-2 flex-shrink-0"/>
+                                    <p className="text-xs line-clamp-1">
+                                        {attachment.Name}
+                                    </p>
+                                    {deletingId === attachment.id && (
+                                        <div>
+                                            <Loader2 className="h-4 w-4 animate-spin"/>
+                                        </div>
+                                    )}
+                                    {deletingId !== attachment.id && (
+                                        <button
+                                            onClick={() => onDelete(attachment.id)}
+                                            className="ml-auto hover:opacity-75 transition"
+                                        >
+                                            <X className="h-4 w-4"/>
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </>
             )}
